@@ -14,6 +14,3 @@ def execute(cmd):
     print('Total number of pings: ' + str(count))
     popen.stdout.close()
     return count
-
-for path in execute('fping -a -b 12 -i 10 -r 2 -t 100 -g 10.142.104.0/22'):
-    print(path, end="")
