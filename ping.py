@@ -1,11 +1,7 @@
 import os
+import getSubnet
 
-dirpath = os.path.dirname(os.path.realpath(__file__))
-subnet = '10.142'
-
-with open(dirpath + '/good_ips.txt', 'a') as file:
-	for p3 in range(256):
-		for p4 in range(256):
-			ip_address = subnet + '.' + str(p3) + '.' + str(p4)
-			# if not os.system('ping -c 1 -W 1 ' + ip_address):
-			file.write(ip_address + '\n')
+subnet = getSubnet.get_subnet()
+os.system('echo "Pinging..."')
+os.system('fping -a -b 12 -i 10 -r 2 -t 100 -g '+subnet+' > ips.txt')
+with open('ips.txt') as fh: print(len(fh.readlines()),'devices found')
