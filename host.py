@@ -1,6 +1,6 @@
 from __future__ import print_function # Python 2.x
 import easygui as g
-import subnet, ping
+import subnet
 import requests
 import subprocess
 import json
@@ -55,7 +55,8 @@ def execute(cmd):
 
 ip = subnet.get_subnet()[:-3]
 
-for path in execute('fping -a -b 12 -i 10 -r 2 -t 100 -g 10.142.104.0/22'):
+access_ip = '10.142.36.0/22'
+for path in execute('fping -a -b 12 -i 10 -r 2 -t 100 -g ' + access_ip):
     print(path, end="")
 
 return_array = {}

@@ -1,2 +1,0 @@
-	inet 127.0.0.1 netmask 0xff000000 
-	inet 10.142.33.160 netmask 0xfffffc00 broadcast 10.142.35.255
