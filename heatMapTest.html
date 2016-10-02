@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src = "https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
     <meta charset="utf-8">
     <title>Heatmaps</title>
     <style>
@@ -51,80 +52,120 @@
       // parameter when you first load the API. For example:
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
-      var map, heatmap;
+
 
       function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
+
+
+      var myFirebaseRef = new Firebase("https://myfipy-2c7eb.firebaseio.com/myData/test");
+      //var leadsRef = myFirebaseRef.ref("myData");
+      myFirebaseRef.on("value", function(snapshot) {
+                    var map, heatmap;
+      var events = []
+      event_name = []
+      location_name = []
+      street_address = []
+      lat = []
+      long = []
+      ip = []
+      people = []
+      contentStrings = []
+      set_up_strings = ['<div id="content">'+'<div id="siteNotice">'+'</div>'+'<h1 id="firstHeading" class="firstHeading">', '</h1>' + '<div id="bodyContent">' + 'There are approximately ', ' people at ', '.<br>Subnet IP Address: ' ,'</div>' + '</div>']
+      totalPeople = 0
+
+
+        snapshot.forEach(function(childSnapshot) {
+            var data = childSnapshot.val()
+            event_name.push(data.event_name)
+            location_name.push(data.location_name)
+            street_address.push(data.street_address)
+            lat.push(data.lat)
+            long.push(data.long)
+            ip.push(data.ip)
+            people.push(data.people)
+            console.log('hhaskf asdf')
+            contentStrings.push(set_up_strings[0] + event_name[event_name.length-1] + set_up_strings[1] + people[people.length-1] + set_up_strings[2] + street_address[street_address.length-1] + set_up_strings[3] + ip[ip.length-1] + set_up_strings[4])
+            events.push([event_name[event_name.length-1], location_name[location_name.length-1], street_address[street_address.length-1], lat[lat.length-1], long[long.length-1], ip[ip.length-1], people[people.length-1], contentStrings[contentStrings.length-1]])
+            totalPeople = totalPeople + events[events.length-1][7]
+            console.log(events[0])
+          })
+
+                map = new google.maps.Map(document.getElementById('map'), {
           zoom: 13,
-          center: {lat: 37.775, lng: -122.434},
+          center: {lat: 37.873, lng: -122.252},
           mapTypeId: 'satellite'
         });
 
-        var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(37.785, -122.435),
-          map: map,
-          title: 'Hello World!'
-        });
 
-        var name = 'Example_Name'
-        var people = 'Example_Number_People'
-        var address = 'Example_Address'
+        <!-- ACCESSING DATA -->
 
-        set_up_strings = ['<div id="content">'+'<div id="siteNotice">'+'</div>'+'<h1 id="firstHeading" class="firstHeading">', '</h1>' + '<div id="bodyContent">' + 'There are approximately ', ' people at ', '.</div>' + '</div>']
-        var contentString = set_up_strings[0] + name + set_up_strings[1] + people + set_up_strings[2] + address + set_up_strings[3]
+        markers = []
+        infowindows = []
+        listeners = []
 
-       var infowindow = new google.maps.InfoWindow({
-         content: contentString
-       });
 
-       marker.addListener('click', function() {
-         infowindow.open(map, marker);
-       });
 
-        heatmap = new google.maps.visualization.HeatmapLayer({
+       heatmap = new google.maps.visualization.HeatmapLayer({
           data: getPoints(),
           map: map
         });
-      }
+        function changeRadius() {
+          heatmap.set('radius', heatmap.get('radius') ? null : 50);
+        }
+        changeRadius()
 
-      function toggleHeatmap() {
-        heatmap.setMap(heatmap.getMap() ? null : map);
-      }
-
-      function changeGradient() {
-        var gradient = [
-          'rgba(0, 255, 255, 0)',
-          'rgba(0, 255, 255, 1)',
-          'rgba(0, 191, 255, 1)',
-          'rgba(0, 127, 255, 1)',
-          'rgba(0, 63, 255, 1)',
-          'rgba(0, 0, 255, 1)',
-          'rgba(0, 0, 223, 1)',
-          'rgba(0, 0, 191, 1)',
-          'rgba(0, 0, 159, 1)',
-          'rgba(0, 0, 127, 1)',
-          'rgba(63, 0, 91, 1)',
-          'rgba(127, 0, 63, 1)',
-          'rgba(191, 0, 31, 1)',
-          'rgba(255, 0, 0, 1)'
-        ]
-        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
-      }
-
-      function changeRadius() {
-        heatmap.set('radius', heatmap.get('radius') ? null : 20);
-      }
-
-      function changeOpacity() {
-        heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
-      }
-
-      // Heatmap data: 500 Points
       function getPoints() {
-        return [
-          {location: new google.maps.LatLng(37.785, -122.435), weight: 1}
-                ];
+        locations = []
+        for(var i = 0; i < events.length; i = i + 1) {
+          new_marker = new google.maps.Marker({
+            position: new google.maps.LatLng(lat[i], long[i]),
+            map: map,
+          });
+          markers.push(new_marker);
+          console.log(contentStrings[i])
+          new_infow = new google.maps.InfoWindow({
+            content: contentStrings[i]
+          });
+          infowindows.push(new_infow);
+          new_marker.addListener('click', function() {
+            new_infow.open(map, new_marker);
+          });
+
+          new_marker.addListener('click', function() {
+            for(i = 0; i < markers.length; i = i + 1){
+              if(markers[i] == self){
+                console.log("index of marker" + i + "and" + i)
+                console.log("what the heck" + new_marker)
+                infowindow.open(map, self);
+                break
+              }
+           }
+
+            console.log("inside" + i);
+
+          });
+        }
+        for(var i = 0; i < events.length; i = i + 1){
+          console.log("length" +  events.length)
+          console.log("fucing " + i)
+          console.log(events.length == 0 ? "nothign to display" : events[0]);
+          locations.push({location: new google.maps.LatLng(events[i][3], events[i][4]), weight: (1)});
+          console.log("weight" + i + (events[i][7]))
+        }
+        return locations
       }
+
+
+
+
+
+      });
+
+
+
+
+      }
+
     </script>
     <script type = "text/javascript"
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhPWKjMmndMVl7vUMJjt9JG8JeG2oTGaI&libraries=visualization&callback=initMap">
