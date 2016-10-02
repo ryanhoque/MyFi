@@ -5,7 +5,7 @@ import requests
 import subprocess
 import json
 
-g.msgbox('Hello, and welcome to MyFi.py! MyFi.py is a quick and easy way to set up an event, and let others in your community know!', 'Welcome to MyFi.py!')
+g.msgbox('Hello, and welcome to MyFi.py! MyFi.py is a quick and easy way to set up an event, and let others in your community know!', 'Welcome to MyFi.py!', image = 'logo_small.jpg')
 reply = g.ccbox('This easy setup will walk a host in setting up an event on MyFi. Confirm you wish to set up an event.')
 if not reply:
     sys.exit(0)
