@@ -131,6 +131,10 @@
             new_infow.open(map, new_marker);
           });
 
+          listeners.push([new_marker, new_infow])
+          console.log("LENGTH " + listeners.length)
+          console.log(listeners[0])
+          console.log(listeners[2])
           new_marker.addListener('click', function() {
             for(i = 0; i < markers.length; i = i + 1){
               if(markers[i] == self){
@@ -146,11 +150,7 @@
           });
         }
         for(var i = 0; i < events.length; i = i + 1){
-          console.log("length" +  events.length)
-          console.log("fucing " + i)
-          console.log(events.length == 0 ? "nothign to display" : events[0]);
-          locations.push({location: new google.maps.LatLng(events[i][3], events[i][4]), weight: (1)});
-          console.log("weight" + i + (events[i][7]))
+          locations.push({location: new google.maps.LatLng(events[i][3], events[i][4]), weight: (events[i][6])});
         }
         return locations
       }
